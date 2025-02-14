@@ -57,7 +57,9 @@ app.delete("/user", async (req, res) => {
 app.patch("/user", async (req, res) => {
   const userId = req.body.userId;
   try {
-    const user = await User.findByIdAndUpdate(userId, req.body);
+    const user = await User.findByIdAndUpdate(userId, req.body, {
+      runValidators: true,
+    });
     if (!user) {
       return res.status(404).send("User not found");
     } else {
