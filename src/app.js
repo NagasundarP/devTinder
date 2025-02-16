@@ -2,17 +2,47 @@ const express = require("express");
 const connectDB = require("./config/database");
 const app = express();
 const User = require("./models/user");
+const { validateSignUp } = require("./utils/validations");
+const bcrypt = require("bcrypt");
 
 app.use(express.json());
 
 // signup api
 app.post("/signup", async (req, res) => {
-  const user = new User(req.body);
   try {
+    validateSignUp(req);
+
+    const { password } = req.body;
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    console.log(passwordHash);
+
+    const user = new User({ ...req.body, password: passwordHash });
+
     await user.save();
+    res.status(201).send("User created successfully");
     res.send(user);
   } catch (err) {
     res.status(400).send("Error creating the user");
+  }
+});
+
+// login api
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+
+    const user = await User.findOne({ emailId });
+    if (!user) {
+      return res.status(404).send("Invalid credentials");
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).send("Invalid credentials");
+    }
+    res.send("Login successful");
+  } catch (err) {
+    res.status(400).send("Error logging in");
   }
 });
 
