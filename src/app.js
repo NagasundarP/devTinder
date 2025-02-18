@@ -37,10 +37,10 @@ app.post("/login", async (req, res) => {
       return res.status(404).send("Invalid credentials");
     }
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).send("Invalid credentials");
+    if (isMatch) {
+      res.cookie("token", user._id);
+      res.send("Login successful");
     }
-    res.send("Login successful");
   } catch (err) {
     res.status(400).send("Error logging in");
   }
