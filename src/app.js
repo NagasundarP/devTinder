@@ -4,8 +4,11 @@ const app = express();
 const User = require("./models/user");
 const { validateSignUp } = require("./utils/validations");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 app.use(express.json());
+app.use(cookieParser());
 
 // signup api
 app.post("/signup", async (req, res) => {
@@ -38,11 +41,36 @@ app.post("/login", async (req, res) => {
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
-      res.cookie("token", user._id);
+      const token = await jwt.sign(
+        {
+          userId: user._id,
+        },
+        ""
+      );
+
+      console.log(token);
+
+      res.cookie("token", token);
       res.send("Login successful");
     }
   } catch (err) {
     res.status(400).send("Error logging in");
+  }
+});
+
+app.get("/profile", async (req, res) => {
+  try {
+    const cookies = req.cookies;
+    const {token} = cookies;
+    const decoded = jwt.verify(token, "");
+    console.log(decoded);
+    const {userId} = decoded;
+    const user = await User.findById(userId);
+    console.log(user)
+    console.log("The logged in user is", userId); 
+    res.send("Reading cookie");
+  } catch (err) {
+    res.status(400).send("Error reading cookie");
   }
 });
 
