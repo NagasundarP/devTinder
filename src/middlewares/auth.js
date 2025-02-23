@@ -8,7 +8,7 @@ const userAuth = async (req, res, next) => {
       throw new Error("Token not found");
     }
 
-    const decodedObj = jwt.verify(token, "");
+    const decodedObj = jwt.verify(token, "DEV@Tinder$790");
 
     const { userId } = decodedObj;
 
