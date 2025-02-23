@@ -39,20 +39,15 @@ app.post("/login", async (req, res) => {
     if (!user) {
       return res.status(404).send("Invalid credentials");
     }
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await user.validatePassword(password);
+    console.log(isMatch);
     if (isMatch) {
-      const token = await jwt.sign(
-        {
-          userId: user._id,
-        },
-        "",
-        { expiresIn: "1d" }
-      );
+      const token = await user.getJWT();
       res.cookie("token", token);
       res.send("Login successful");
     }
   } catch (err) {
-    res.status(400).send("Error logging in");
+    res.status(400).send(err);
   }
 });
 
@@ -60,7 +55,7 @@ app.get("/profile", userAuth, async (req, res) => {
   try {
     const cookies = req.cookies;
     const { token } = cookies;
-    const decoded = jwt.verify(token, "");
+    const decoded = jwt.verify(token, "DEV@Tinder$790");
 
     const { userId } = decoded;
     const user = req.user;
