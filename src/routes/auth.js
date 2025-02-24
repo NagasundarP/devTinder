@@ -6,7 +6,6 @@ const User = require("../models/user");
 const { validateSignUp } = require("../utils/validations");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
-const { userAuth } = require("../middlewares/auth");
 
 authRouter.use(express.json());
 authRouter.use(cookieParser());
@@ -54,6 +53,13 @@ authRouter.post("/login", async (req, res) => {
   } catch (err) {
     res.status(400).send(err);
   }
+});
+
+authRouter.post("/logout", async (req, res) => {
+  res.cookie("token", null, {
+    expires: new Date(Date.now()), 
+  });
+  res.send("Logged out successfully");
 });
 
 module.exports = authRouter;
