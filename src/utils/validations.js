@@ -15,3 +15,14 @@ const validateSignUp = (req) => {
     throw new Error("Password is not strong enough");
   }
 };
+
+
+const validateEditProfile = (req) => {
+  const allowedEdits = ["firstName", "lastName","gender", "emailId", "age", "photoUrl", "skills"];
+  const updates = Object.keys(req.body);
+  const isValidOperation = updates.every((update) => allowedEdits.includes(update));
+
+  return isValidOperation
+}
+
+module.exports = { validateSignUp, validateEditProfile };

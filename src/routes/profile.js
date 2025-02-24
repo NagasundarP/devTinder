@@ -1,6 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const { userAuth } = require("../middlewares/auth");
+const { validateEditProfile } = require("../utils/validations");
 
 const profileRouter = express.Router();
 
@@ -15,6 +16,22 @@ profileRouter.get("/profile", userAuth, async (req, res) => {
     res.send("Reading cookie");
   } catch (err) {
     res.status(400).send("Error reading cookie");
+  }
+});
+
+profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
+  try {
+    if (!validateEditProfile(req)) {
+      throw new Error("Invalid updates");
+    }
+    const user = req.user;
+    Object.keys(req.body).forEach((update) => {
+      user[update] = req.body[update];
+    });
+    await user.save();
+    res.send(`${user.firstName} your profile has been updated successfully`);
+  } catch (err) {
+    res.status(400).send(err);
   }
 });
 
