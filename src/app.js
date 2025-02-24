@@ -1,77 +1,17 @@
 const express = require("express");
 const connectDB = require("./config/database");
 const app = express();
-const User = require("./models/user");
-const { validateSignUp } = require("./utils/validations");
-const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
-const { userAuth } = require("./middlewares/auth");
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
+const requestsRouter = require("./routes/requests");
 
 app.use(express.json());
 app.use(cookieParser());
 
-// signup api
-app.post("/signup", async (req, res) => {
-  try {
-    validateSignUp(req);
-
-    const { password } = req.body;
-
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    const user = new User({ ...req.body, password: passwordHash });
-
-    await user.save();
-    res.status(201).send("User created successfully");
-    res.send(user);
-  } catch (err) {
-    res.status(400).send("Error creating the user");
-  }
-});
-
-// login api
-app.post("/login", async (req, res) => {
-  try {
-    const { emailId, password } = req.body;
-
-    const user = await User.findOne({ emailId });
-    if (!user) {
-      return res.status(404).send("Invalid credentials");
-    }
-    const isMatch = await user.validatePassword(password);
-    console.log(isMatch);
-    if (isMatch) {
-      const token = await user.getJWT();
-      res.cookie("token", token);
-      res.send("Login successful");
-    }
-  } catch (err) {
-    res.status(400).send(err);
-  }
-});
-
-app.get("/profile", userAuth, async (req, res) => {
-  try {
-    const cookies = req.cookies;
-    const { token } = cookies;
-    const decoded = jwt.verify(token, "DEV@Tinder$790");
-
-    const { userId } = decoded;
-    const user = req.user;
-    res.send("Reading cookie");
-  } catch (err) {
-    res.status(400).send("Error reading cookie");
-  }
-});
-
-app.post("/createConnectionReq", userAuth, (req, res) => {
-  const user = req.user;
-
-  console.log("Request sent successfully");
-
-  res.send(user.firstName + "Connection request sent successfully");
-});
+app.use("/", authRouter);
+// app.use("/", profileRouter);
+// app.use("/", requestsRouter);
 
 connectDB()
   .then(() => {
