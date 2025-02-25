@@ -1,8 +1,8 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const { userAuth } = require("../middlewares/auth");
-const { validateEditProfile } = require("../utils/validations");
-
+const { validateEditProfile, validateEditPassword } = require("../utils/validations");
+const bcrypt = require("bcrypt");
 const profileRouter = express.Router();
 
 profileRouter.get("/profile", userAuth, async (req, res) => {
@@ -34,5 +34,23 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
     res.status(400).send(err);
   }
 });
+
+profileRouter.patch("/profile/forgotPassword", userAuth, async (req, res) => {
+  try {
+    validateEditPassword(req);
+    const user = req.user;
+    user.password = req.body.password;
+    const passwordHash = await bcrypt.hash(user.password, 10);
+    user.password = passwordHash;
+    console.log(user.password);
+    await user.save();
+    res.send(`${user.firstName} your password updated successfully`);
+  } catch (err) {
+    res
+      .status(400)
+      .send("Error updating password. Please try again later.");
+  }
+}
+);
 
 module.exports = profileRouter;
