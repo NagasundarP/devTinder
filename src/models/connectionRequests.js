@@ -23,6 +23,15 @@ const connectionRequestsSchema = new mongoose.Schema(
   }
 );
 
+connectionRequestsSchema.pre("save", async function (next) {
+  const request = this;
+  // check if form and to user are same
+  if (request.fromUserId.equals(request.toUserId)) {
+    throw new Error("You cannot send request to yourself");
+  }
+  next();
+});
+
 const ConnectionRequest = new mongoose.model(
   "ConnectionRequest",
   connectionRequestsSchema

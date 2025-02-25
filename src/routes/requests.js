@@ -2,6 +2,7 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const { userAuth } = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequests");
+const User = require("../models/user");
 
 const requestsRouter = express.Router();
 
@@ -21,6 +22,13 @@ requestsRouter.post(
       if (!allowedStatus.includes(status)) {
         return res.status(400).json({
           message: "Invalid status",
+        });
+      }
+
+      const toUser = await User.findOne({ _id: toUserId });
+      if (!toUser) {
+        return res.status(400).json({
+          message: "User not found",
         });
       }
 
@@ -44,7 +52,7 @@ requestsRouter.post(
       });
       const data = await connectionRequest.save();
       res.json({
-        message: "Connection request sent successfully",
+        message: req.user.firstName + " is intrested in " + toUser.firstName,
         data: data,
       });
     } catch (err) {
