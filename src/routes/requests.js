@@ -61,4 +61,17 @@ requestsRouter.post(
   }
 );
 
+requestsRouter.post(
+  "/request/review/:status/:requestId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedInUserId = req.user._id;
+    } catch (err) {
+      res.send
+    }
+  }
+);
+
+
 module.exports = requestsRouter;
