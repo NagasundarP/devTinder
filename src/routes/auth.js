@@ -15,7 +15,6 @@ authRouter.post("/signup", async (req, res) => {
     validateSignUp(req);
 
     const { firstName, lastName, emailId, password } = req.body;
-    console.log("hello");
 
     const passwordHash = await bcrypt.hash(password, 10);
 
@@ -25,7 +24,6 @@ authRouter.post("/signup", async (req, res) => {
       emailId,
       password: passwordHash,
     });
-    console.log(user);
 
     await user.save();
     res.status(201).send("User created successfully");
@@ -44,7 +42,7 @@ authRouter.post("/login", async (req, res) => {
       return res.status(404).send("Invalid credentials");
     }
     const isMatch = await user.validatePassword(password);
-    console.log(isMatch);
+
     if (isMatch) {
       const token = await user.getJWT();
       res.cookie("token", token);

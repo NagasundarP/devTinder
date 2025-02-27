@@ -42,7 +42,6 @@ profileRouter.patch("/profile/forgotPassword", userAuth, async (req, res) => {
     user.password = req.body.password;
     const passwordHash = await bcrypt.hash(user.password, 10);
     user.password = passwordHash;
-    console.log(user.password);
     await user.save();
     res.send(`${user.firstName} your password updated successfully`);
   } catch (err) {
