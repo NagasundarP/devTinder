@@ -27,8 +27,14 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
         { toUserId: loggedInUser._id, status: "accepted" },
         { fromUserId: loggedInUser._id, status: "accepted" },
       ],
-    }).populate("fromUserId", USER_FIELDS);
-    const data  = connections.map((row) => row.fromUserId);
+    })
+      .populate("fromUserId", USER_FIELDS)
+      .populate("toUserId", USER_FIELDS);
+    const data = connections.map((row) =>
+      row.fromUserId._id.toString() === loggedInUser._id.toString()
+        ? row.toUserId
+        : row.fromUserId
+    );
     res.send(data);
   } catch (err) {
     res.status(400).send("Error reading connections" + err);
