@@ -13,7 +13,7 @@ profileRouter.get("/profile", userAuth, async (req, res) => {
 
     const { userId } = decoded;
     const user = req.user;
-    res.send("Reading cookie");
+    res.send(user);
   } catch (err) {
     res.status(400).send("Error reading cookie");
   }
