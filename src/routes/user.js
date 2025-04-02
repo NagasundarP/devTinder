@@ -5,11 +5,12 @@ const User = require("../models/user");
 
 const userRouter = express.Router();
 
-const USER_FIELDS = ["firstName", "lastName", "about", "skills"];
+const USER_FIELDS = ["firstName", "lastName","age" ,"about", "skills","photoUrl"];
 
 userRouter.get("/user/requests/received", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
+    // console.log(loggedInUser)
     const requests = await ConnectionRequest.find({
       toUserId: loggedInUser._id,
       status: "interested",

@@ -21,9 +21,9 @@ profileRouter.get("/profile", userAuth, async (req, res) => {
 
 profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
   try {
-    if (!validateEditProfile(req)) {
-      throw new Error("Invalid updates");
-    }
+    // if (!validateEditProfile(req)) {
+    //   throw new Error("Invalid updates");
+    // }
     const user = req.user;
     Object.keys(req.body).forEach((update) => {
       user[update] = req.body[update];
